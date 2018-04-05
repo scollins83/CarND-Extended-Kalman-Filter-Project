@@ -3,6 +3,8 @@
 #include "Eigen/Dense"
 #include <iostream>
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "IncompatibleTypes"
 using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -36,14 +38,14 @@ FusionEKF::FusionEKF() {
     * Finish initializing the FusionEKF.
     * Set the process and measurement noises
   */
-
-
 }
 
 /**
 * Destructor.
 */
 FusionEKF::~FusionEKF() {}
+
+
 
 void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
@@ -67,11 +69,16 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       /**
       Convert radar from polar to cartesian coordinates and initialize state.
       */
+      ekf_.x_ << convert_radar_from_polar_to_cartesian(measurement_pack.raw_measurements_[0],
+                                                       measurement_pack.raw_measurements_[1],
+                                                       measurement_pack.raw_measurements_[2]);
+                             
     }
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
       /**
       Initialize state.
       */
+      ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0;
     }
 
     // done initializing, no need to predict or update
@@ -113,3 +120,19 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   cout << "x_ = " << ekf_.x_ << endl;
   cout << "P_ = " << ekf_.P_ << endl;
 }
+
+bool FusionEKF::get_initialization() {
+  return is_initialized_;
+}
+
+Eigen::VectorXd FusionEKF::convert_radar_from_polar_to_cartesian(float rho, float phi, float rho_dot) {
+  Eigen::VectorXd return_vector = VectorXd(4);
+  float x = rho * cos(phi);
+  float y = rho * sin(phi);
+  float vx = rho_dot * cos(phi);
+  float vy = rho_dot * sin(phi);
+  return_vector << x, y, vx, vy;
+  return return_vector;
+}
+
+#pragma clang diagnostic pop
