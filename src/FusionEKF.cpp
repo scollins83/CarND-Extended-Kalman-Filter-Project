@@ -38,6 +38,9 @@ FusionEKF::FusionEKF() {
     * Finish initializing the FusionEKF.
     * Set the process and measurement noises
   */
+  // Determine which and where to add H and R to the kalman filter. Ok, decided to try it down in the initialization.
+
+
 }
 
 /**
@@ -64,6 +67,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     cout << "EKF: " << endl;
     ekf_.x_ = VectorXd(4);
     ekf_.x_ << 1, 1, 1, 1;
+    ekf_.P_ = MatrixXd(4, 4);
+
 
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
       /**
@@ -72,6 +77,10 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       ekf_.x_ << convert_radar_from_polar_to_cartesian(measurement_pack.raw_measurements_[0],
                                                        measurement_pack.raw_measurements_[1],
                                                        measurement_pack.raw_measurements_[2]);
+
+      ekf_.H_ << Hj_;
+      ekf_.R_ << R_radar_;
+
                              
     }
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
@@ -79,9 +88,18 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       Initialize state.
       */
       ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0;
+      ekf_.H_ << H_laser_;
+      ekf_.R_ << R_laser_;
     }
 
+    // Initialize the state covariance matrix, P
+    ekf_.P_ << 1, 0, 0 , 0,    // Not sure why these values are set as they are.
+            0, 1, 0, 0,
+            0, 0, 1000, 0,
+            0, 0, 0, 1000;
+
     // done initializing, no need to predict or update
+    previous_timestamp_ = measurement_pack.timestamp_;
     is_initialized_ = true;
     return;
   }
