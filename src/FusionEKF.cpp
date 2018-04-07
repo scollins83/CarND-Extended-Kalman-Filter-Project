@@ -156,9 +156,19 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    */
 
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
+    // Convert polar to Cartesian
+    ekf_.x_ << convert_radar_from_polar_to_cartesian(measurement_pack.raw_measurements_[0],
+                                                     measurement_pack.raw_measurements_[1],
+                                                     measurement_pack.raw_measurements_[2]);
     // Radar updates
+    ekf_.H_ << Hj_;
+    ekf_.H_ << tools.CalculateJacobian(ekf_.x_);
+    // TODO: START HERE!!!!!!
+    ekf_.UpdateEKF(measurement_pack.raw_measurements_);
   } else {
-    // Laser updates
+    // Laser update
+    ekf_.Update(measurement_pack.raw_measurements_);
+
   }
 
   // print the output
