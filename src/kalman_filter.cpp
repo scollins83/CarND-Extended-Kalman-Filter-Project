@@ -23,7 +23,7 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
 void KalmanFilter::Predict() {
   /**
   TODO:
-    * predict the state
+    * predict the state; same for both
   */
   x_ = F_ * x_;
   MatrixXd Ft = F_.transpose();
@@ -45,8 +45,8 @@ void KalmanFilter::Update(const VectorXd &z) {
 
   // Make the new estimate
   x_ = x_ + (K * y);
-  long x_size = x_.size();
-  MatrixXd I = MatrixXd::Identity(x_size, x_size);
+  MatrixXd I;
+  I = MatrixXd::Identity(2, 2);
   P_ = (I - K * H_) * P_;
 }
 
@@ -54,9 +54,20 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   /**
   TODO:
     * update the state by using Extended Kalman Filter equations
+    * Section 14 of lesson 5 says how to do this... have to calculate Z prediction on own.
   */
-  VectorXd z_pred = H_ * x_;
-  VectorXd y = z - z_pred;
+  float x = x_(0);
+  float y = x_(1);
+  float vx = x_(2);
+  float vy = x_(3);
+
+  float rho = sqrt(x * x + y * y);
+  float theta = atan2(y,x);
+  float rho_dot = (x * vx + y * vy);
+  VectorXd z_pred = VectorXd(3);
+  z_pred << rho, theta, rho_dot;
+
+  VectorXd y_vec = z - z_pred;
   MatrixXd Ht = H_.transpose();
   MatrixXd S = H_ * P_ * Ht + R_;
   MatrixXd Si = S.inverse();
@@ -64,8 +75,8 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   MatrixXd K = PHt * Si;
 
   // Make the new estimate
-  x_ = x_ + (K * y);
-  long x_size = x_.size();
-  MatrixXd I = MatrixXd::Identity(x_size, x_size);
+  x_ = x_ + (K * y_vec);
+  MatrixXd I;
+  I = MatrixXd::Identity(2, 2);
   P_ = (I - K * H_) * P_;
 }
