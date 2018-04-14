@@ -1,6 +1,7 @@
 #include <iostream>
 #include "tools.h"
 
+using namespace std;
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
 using std::vector;
@@ -38,7 +39,7 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
   }
 
   //calculate the mean
-  rmse = rmse/estimations.size();
+  rmse = rmse / estimations.size();
 
   //calculate the squared root
   rmse = rmse.array().sqrt();
@@ -68,7 +69,7 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   // Avoid division by zero
   if(fabs(term_1) < 0.0001) {
     cout << "CalculateJacobian () - Error - Division by Zero" << endl;
-    return Hj;
+    term_1 = 0.0001;
   }
   // Compute the Jacobian Matrix
   Hj << (px / term_2), (py / term_2), 0, 0,
