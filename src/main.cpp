@@ -111,7 +111,6 @@ int main()
     	  //Push the current estimated x,y positon from the Kalman filter's state vector
 
     	  VectorXd estimate(4);
-
     	  double p_x = fusionEKF.ekf_.x_(0);
     	  double p_y = fusionEKF.ekf_.x_(1);
     	  double v1  = fusionEKF.ekf_.x_(2);
@@ -125,7 +124,6 @@ int main()
     	  estimations.push_back(estimate);
 
     	  VectorXd RMSE = tools.CalculateRMSE(estimations, ground_truth);
-
           json msgJson;
           msgJson["estimate_x"] = p_x;
           msgJson["estimate_y"] = p_y;
@@ -181,5 +179,6 @@ int main()
     std::cerr << "Failed to listen to port" << std::endl;
     return -1;
   }
+
   h.run();
 }
