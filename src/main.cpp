@@ -111,7 +111,7 @@ int main()
     	  //Push the current estimated x,y positon from the Kalman filter's state vector
 
     	  VectorXd estimate(4);
-
+    	  cout << "Main estimate setting... " << endl;
     	  double p_x = fusionEKF.ekf_.x_(0);
     	  double p_y = fusionEKF.ekf_.x_(1);
     	  double v1  = fusionEKF.ekf_.x_(2);
@@ -121,11 +121,12 @@ int main()
     	  estimate(1) = p_y;
     	  estimate(2) = v1;
     	  estimate(3) = v2;
+    	  cout << "Main estimate setting... " << endl;
     	  
     	  estimations.push_back(estimate);
 
     	  VectorXd RMSE = tools.CalculateRMSE(estimations, ground_truth);
-
+    	  cout << "RMSE Calculated..." << endl;
           json msgJson;
           msgJson["estimate_x"] = p_x;
           msgJson["estimate_y"] = p_y;
