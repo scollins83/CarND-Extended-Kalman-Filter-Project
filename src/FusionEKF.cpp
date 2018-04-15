@@ -86,11 +86,9 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     // first measurement
     cout << "EKF: " << endl;
     ekf_.x_ = VectorXd(4);
-    ekf_.x_ << 1, 1, 1, 1;  // Will override the first two values; will need to tweak the last two, which will affect the RMSE. If too high, will accumulate high RMSE right at beginning.
-
-
+    ekf_.x_ << 1, 1, .001, .02;  // Will override the first two values; will need to tweak the last two, which will affect the RMSE. If too high, will accumulate high RMSE right at beginning.
     // TODO: Walkthrough, play with last two values to manipulate RMSE
-    cout << "x_ set" << endl;
+
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
       /**
       Convert radar from polar to cartesian coordinates and initialize state.
@@ -114,17 +112,10 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0;
     }
 
-    // Get rid of any zeros for division
-    //if (fabs(ekf_.x_[0]) < NONZERO and fabs(ekf_.x_[1]) < NONZERO){
-    //  ekf_.x_[0] = NONZERO;
-     // ekf_.x_[1] = NONZERO;
-     // cout << "Divide by zero used " << endl;
-    //}
-
     // done initializing, no need to predict or update
     previous_timestamp_ = measurement_pack.timestamp_;
     is_initialized_ = true;
-    cout << "Prev timestamp and initialized set" << endl;
+
     return;
   }
 
