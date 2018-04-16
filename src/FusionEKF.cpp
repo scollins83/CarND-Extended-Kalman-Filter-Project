@@ -86,7 +86,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     // first measurement
     cout << "EKF: " << endl;
     ekf_.x_ = VectorXd(4);
-    ekf_.x_ << 1, 1, .001, .02;  // Will override the first two values; will need to tweak the last two, which will affect the RMSE. If too high, will accumulate high RMSE right at beginning.
+    ekf_.x_ << 1, 1, 0.001, 0.001;  // Will override the first two values; will need to tweak the last two, which will affect the RMSE. If too high, will accumulate high RMSE right at beginning.
     // TODO: Walkthrough, play with last two values to manipulate RMSE
 
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
