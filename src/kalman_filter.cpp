@@ -56,8 +56,9 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
     * update the state by using Extended Kalman Filter equations
     * Section 14 of lesson 5 says how to do this... have to calculate Z prediction on own.
   */
+
   float rho = sqrt(x_(0)*x_(0) + x_(1)*x_(1));
-  float theta = atan2(x_(1),x_(0));
+  float phi = atan2(x_(1),x_(0));
   float rho_dot;
   if (fabs(rho) < 0.0001){
     rho_dot = 0;
@@ -65,8 +66,19 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
     rho_dot = (x_(0)*x_(2) + x_(1)*x_(3))/rho;
   }
 
+  float pi = 3.14;
+
+  while (fabs(phi) > pi) {
+      if (phi > 0) {
+          phi -= 2*pi;
+      }
+      else {
+          phi += 2*pi;
+      }
+  }
+
   VectorXd z_pred(3);
-  z_pred << rho, theta, rho_dot;
+  z_pred << rho, phi, rho_dot;
 
   VectorXd y = z - z_pred;
   MatrixXd Ht = H_.transpose();
